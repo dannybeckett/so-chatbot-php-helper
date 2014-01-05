@@ -1,2 +1,3 @@
-so-chatbot-php-helper
-=====================
+This PHP helps [../SO-ChatBot](https://github.com/dannybeckett/SO-ChatBot).
+
+Since we can't get non-[JSONP](https://en.wikipedia.org/wiki/JSONP) data (e.g. XML) from another domain in JS due to [CORS](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing), requests are proxied through the server instead.
