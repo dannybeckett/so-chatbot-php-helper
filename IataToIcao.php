@@ -1,8 +1,9 @@
 <?php
 	
 	$airport = $_GET['a'];
+	$callback = $_GET['callback'];
 	
-	if(!$airport || strlen($airport) !== 3)
+	if(!$airport || !$callback || strlen($airport) !== 3)
 	{
 		die();
 	}
@@ -24,6 +25,6 @@
 		die('-1');
 	}
 	
-	echo $iata;
+	echo $callback . '({"icao":"' . $iata . '"})';
 	
 ?>
