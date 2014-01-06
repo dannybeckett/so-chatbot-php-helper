@@ -12,5 +12,5 @@
 			return json_encode(simplexml_load_string($xml));
 		}
 	}
-
+	
 ?>
