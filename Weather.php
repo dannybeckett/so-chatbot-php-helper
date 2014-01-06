@@ -2,7 +2,7 @@
 	
 	$airport = $_GET['a'];
 	
-	if(!$airport)
+	if(!$airport || strlen($airport) !== 4)
 	{
 		die();
 	}
