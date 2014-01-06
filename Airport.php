@@ -1,0 +1,61 @@
+<?php
+	
+	class Airport
+	{
+		public $match;
+		public $iata;
+		public $icao;
+		public $name;
+
+		public function __construct($input)
+		{
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, 'http://www.ourairports.com/search?q=' . $input);
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$html = curl_exec($ch);
+			curl_close($ch);
+			
+			$dom = new DOMDocument();
+			$dom->loadHTML($html);
+			$path = new DOMXPath($dom);
+			
+			$this->match = $path->query("//p[@class='info']")->length === 0;
+			
+			if($this->match)
+			{
+				$data = $path->query("//div[@class='column-in']/div")->item(0)->nodeValue;
+				
+				// LPL EGGP
+				if(strpos($data, ' ') !== false)
+				{
+					$codes = explode(' ', $data);
+					$this->iata = $codes[0];
+					$this->icao = $codes[1];
+				}
+				
+				// FDKB
+				else
+				{
+					$this->icao = $data;
+				}
+				
+				$this->name = trim($path->query("//h1")->item(0)->nodeValue);
+			}
+		}
+		
+		public function ToJSON()
+		{
+			// Remove ONLY null (keep false)
+			// http://stackoverflow.com/questions/7741415/strip-null-values-of-json-object/
+			
+			function is_not_null($var)
+			{
+				return !is_null($var);
+			}
+			
+			return json_encode(array_filter((array) $this, 'is_not_null'));
+		}
+	}
+	
+?>
