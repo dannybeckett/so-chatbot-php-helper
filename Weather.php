@@ -7,7 +7,7 @@
 	
 	if(!$airport || !$callback || (!$isIata && !$isIcao))
 	{
-		die($callback . '({"error":"BadParameters"})');
+		die($callback . '({"error":"BadParams"})');
 	}
 	
 	require_once('XmlToJson.php');
