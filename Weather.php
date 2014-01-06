@@ -23,6 +23,10 @@
 		}
 	}
 	
-	echo $callback . '(' . XmlToJson::FromUrl('http://aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&stationString=' . $airport . '&hoursBeforeNow=24&mostRecent=true') . ')';
+	// Append the ICAO code, in case we were sent an IATA code, so weather.js receives it back if there is no METAR data
+	
+	echo	$callback . '(' .
+			substr(XmlToJson::FromUrl('http://aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&stationString=' . $airport . '&hoursBeforeNow=24&mostRecent=true'), 0, -1) .
+			',"icao":"' . $airport . '"})';
 	
 ?>
