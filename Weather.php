@@ -10,8 +10,8 @@
 		die($callback . '({"error":"BadParams"})');
 	}
 	
-	require_once('XMLToJSON.php');
-	require_once('Airport.php');
+	require_once('Classes/XMLToJSON.php');
+	require_once('Classes/Airport.php');
 	
 	$Airport = new Airport($airport);
 	
