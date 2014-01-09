@@ -27,11 +27,25 @@
 				$data = $path->query("//div[@class='column-in']/div")->item(0)->nodeValue;
 				
 				// LPL EGGP
+				// KMMV MMV
 				if(strpos($data, ' ') !== false)
 				{
 					$codes = explode(' ', $data);
-					$this->iata = $codes[0];
-					$this->icao = $codes[1];
+					
+					// Sometimes the codes are back-to-front - additional sanity check
+					// http://chat.stackexchange.com/transcript/message/13080686#13080686
+					for($i = 0; $i < 2; $i++)
+					{
+						if(strlen($codes[$i]) === 3)
+						{
+							$this->iata = $codes[$i];
+						}
+						
+						else if(strlen($codes[$i]) === 4)
+						{
+							$this->icao = $codes[$i];
+						}
+					}
 				}
 				
 				// FDKB
