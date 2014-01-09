@@ -6,6 +6,7 @@
 		public $iata;
 		public $icao;
 		public $name;
+		public $link;
 
 		public function __construct($input)
 		{
@@ -55,6 +56,9 @@
 				}
 				
 				$this->name = trim($path->query("//h1")->item(0)->nodeValue);
+				
+				// Shorten the URL to reduce the chance of hitting the 500 char limit
+				$this->link = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode('http://aviationweather.gov/adds/metars/?station_ids=' . $this->icao . '&std_trans=translated&chk_metars=on&chk_tafs=on'));
 			}
 		}
 		
