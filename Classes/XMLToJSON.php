@@ -4,7 +4,7 @@
 	
 	class XMLToJSON
 	{
-		public function FromURL($url)
+		public static function FromURL($url)
 		{
 			$xml = file_get_contents($url);
 			$xml = str_replace(array("\n", "\r", "\t"), '', $xml);
