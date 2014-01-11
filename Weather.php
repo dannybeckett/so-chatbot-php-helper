@@ -18,7 +18,12 @@
 	
 	$Airport = new Airport($airport);
 	
-	if($isIata && is_null($Airport->icao))
+	if($isIata && $Airport->down)
+	{
+		die($callback . '({"error":"NoConvert"})');
+	}
+	
+	else if($isIata && (!$Airport->match || is_null($Airport->icao)))
 	{
 		die($callback . '({"error":"NoICAO"})');
 	}
