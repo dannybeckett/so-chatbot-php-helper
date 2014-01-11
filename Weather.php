@@ -1,6 +1,6 @@
 <?php
 	
-	header('Content-Type: application/json; charset=utf-8');
+	//header('Content-Type: application/json; charset=iso-8859-1');
 	
 	$airport = $_GET['a'];
 	$mode = $_GET['m'];
@@ -16,7 +16,7 @@
 	require_once('Classes/XMLToJSON.php');
 	require_once('Classes/Airport.php');
 	
-	$Airport = new Airport($airport);
+	$Airport = new Airport($airport, $mode);
 	
 	if($isIata && $Airport->down)
 	{

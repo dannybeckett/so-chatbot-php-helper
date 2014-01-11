@@ -10,8 +10,10 @@
 		public $metar;
 		public $taf;
 
-		public function __construct($input)
+		public function __construct($input, $weathermode = null)
 		{
+			require_once('TinyURL.php');
+			
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, 'http://www.ourairports.com/search?q=' . $input);
 			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -42,8 +44,10 @@
 			if($this->icao)
 			{
 				// Shorten the URL to reduce the chance of hitting the 500 char limit
-				$this->metar = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode('http://aviationweather.gov/adds/metars/?station_ids=' . $this->icao . '&std_trans=translated&chk_metars=on&chk_tafs=on'));
-				$this->taf = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode('http://aviationweather.gov/adds/tafs/?station_ids=' . $this->icao . '&std_trans=translated'));
+				if($weathermode !== null)
+				{
+					$this->{rtrim($weathermode, 's')} = TinyURL::Get('http://aviationweather.gov/adds/' . $weathermode . '/?station_ids=' . $this->icao . '&std_trans=translated' . ($weathermode === 'metars' ? '&chk_metars=on&chk_tafs=on' : ''));
+				}
 			}
 			
 			if($this->down)
@@ -99,8 +103,10 @@
 			$this->name = iconv('UTF-8', 'ISO-8859-1', $h1);
 			
 			// Shorten the URL to reduce the chance of hitting the 500 char limit
-			$this->metar = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode('http://aviationweather.gov/adds/metars/?station_ids=' . $this->icao . '&std_trans=translated&chk_metars=on&chk_tafs=on'));
-			$this->taf = file_get_contents('http://tinyurl.com/api-create.php?url=' . urlencode('http://aviationweather.gov/adds/tafs/?station_ids=' . $this->icao . '&std_trans=translated'));
+			if($weathermode !== null)
+			{
+				$this->{rtrim($weathermode, 's')} = TinyURL::Get('http://aviationweather.gov/adds/' . $weathermode . '/?station_ids=' . $this->icao . '&std_trans=translated' . ($weathermode === 'metars' ? '&chk_metars=on&chk_tafs=on' : ''));
+			}
 		}
 		
 		public function ToJSON()
