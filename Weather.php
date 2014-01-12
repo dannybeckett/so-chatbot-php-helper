@@ -1,6 +1,6 @@
 <?php
 	
-	//header('Content-Type: application/json; charset=iso-8859-1');
+	header('Content-Type: text/plain; charset=utf8');
 	
 	$airport = $_GET['a'];
 	$mode = $_GET['m'];
@@ -8,7 +8,7 @@
 	$isIata = strlen($airport) === 3;
 	$isIcao = strlen($airport) === 4;
 	
-	if(!$airport || !$mode || !$callback || (!$isIata && !$isIcao) || ($mode != 'metars' && $mode != 'tafs'))
+	if(!$airport || !$mode || !$callback || (!$isIata && !$isIcao) || ($mode !== 'metars' && $mode !== 'tafs'))
 	{
 		die($callback . '({"error":"BadParams"})');
 	}
@@ -20,16 +20,23 @@
 	
 	if($isIata && $Airport->down)
 	{
-		die($callback . '({"error":"NoConvert"})');
+		die($callback . '({"error":"NoAirport"})');
 	}
 	
-	else if($isIata && (!$Airport->match || is_null($Airport->icao)))
+	else if($isIata && ($Airport->match === false || is_null($Airport->icao)))
 	{
 		die($callback . '({"error":"NoICAO"})');
 	}
 	
 	$url = 'http://aviationweather.gov/adds/dataserver_current/httpparam?dataSource=' . $mode . '&requestType=retrieve&format=xml&stationString=' . $Airport->icao . '&hoursBeforeNow=24&mostRecent=true';
 	
-	echo $callback . '(' . substr(XMLToJSON::FromURL($url), 0, -1) . ',airport:' . $Airport->ToJSON() . '})';
+	$weather = XMLToJSON::FromURL($url);
+	
+	if($weather === false)
+	{
+		die($callback . '({"error":"NoWeather"})');
+	}
+	
+	die($callback . '(' . substr($weather, 0, -1) . ',airport:' . $Airport->ToJSON() . '})');
 	
 ?>
