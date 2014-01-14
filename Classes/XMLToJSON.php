@@ -1,7 +1,5 @@
 <?php
 	
-	ini_set('default_socket_timeout', 5);
-	
 	class XMLToJSON
 	{
 		public static function FromURL($url)
