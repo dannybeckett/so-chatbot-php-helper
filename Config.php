@@ -21,7 +21,7 @@
 	
 	if(!in_array(hash('sha512', $_SERVER['REMOTE_ADDR']), $whitelist))
 	{
-		http_response_code(403);
+		header('HTTP/1.1 403 Forbidden');
 		exit;
 	}
 	
