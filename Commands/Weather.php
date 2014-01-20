@@ -1,8 +1,8 @@
 <?php
 	
-	require_once('Config.php');
-	require_once('Classes/XMLToJSON.php');
-	require_once('Classes/Airport.php');
+	require_once('../Config.php');
+	require_once('../Classes/XMLToJSON.php');
+	require_once('../Classes/Airport.php');
 	
 	$airport = $_GET['a'];
 	$mode = $_GET['m'];
