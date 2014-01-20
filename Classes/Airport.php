@@ -74,9 +74,12 @@
 			// Remove ONLY null (keep false)
 			// http://stackoverflow.com/questions/7741415/strip-null-values-of-json-object/
 			
-			function is_not_null($var)
+			if(!function_exists('is_not_null'))
 			{
-				return !is_null($var);
+				function is_not_null($var)
+				{
+					return !is_null($var);
+				}
 			}
 			
 			return json_encode(array_filter((array) $this, 'is_not_null'));
