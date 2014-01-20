@@ -28,13 +28,13 @@
 	{
 		if($Airport->down)
 		{
-			die($callback . '({"error":"NoAirport"})');
+			die($callback . '({"error":"NoSQL"})');
 		}
-		
-		if($Airport->match === false || is_null($Airport->icao))
-		{
-			die($callback . '({"error":"NoICAO"})');
-		}
+	}
+	
+	if(is_null($Airport->icao))
+	{
+		die($callback . '({"error":"NoICAO"})');
 	}
 	
 	$noaa = array(

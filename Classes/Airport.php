@@ -1,112 +1,72 @@
 <?php
-
+	
+	// This breaks Weather.php - not really sure why :S
+	//require_once('../Config.php');
+	require_once('TinyURL.php');
+	
 	class Airport
 	{
 		public $down = false;
 		public $match;
 		public $iata;
 		public $icao;
-		public $name;
+		public $name = 'Missing';
 		public $metar;
 		public $taf;
 
 		public function __construct($input, $weathermode = null)
 		{
-			require_once('TinyURL.php');
-			
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, 'http://www.ourairports.com/search?q=' . $input);
-			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-			$html = curl_exec($ch);
-			
-			if(curl_error($ch))
-			{
-				$this->down = true;
-			}
-			
-			curl_close($ch);
-			
-			// Set some initial properties, in case we need to return, e.g.
-			// http://chat.stackexchange.com/transcript/message/13128783#13128783
-			
 			if(strlen($input) === 3)
 			{
 				$this->iata = $input;
 			}
 			
-			else if(strlen($input) === 4)
+			elseif(strlen($input) === 4)
 			{
 				$this->icao = $input;
 			}
 			
-			if($this->icao)
+			$db = @new mysqli(DBHOST, DBUSER, DBPASS, DBNAME);
+			
+			if($db->connect_error)
 			{
-				// Shorten the URL to reduce the chance of hitting the 500 char limit
-				if($weathermode !== null)
+				$this->down = true;
+				return;
+			}
+			
+			if($result = $db->query("SELECT * FROM iata_icao WHERE iata = '$input' OR icao = '$input'"))
+			{
+				$row = $result->fetch_assoc();
+				
+				if($row === null)
 				{
-					$this->{rtrim($weathermode, 's')} = TinyURL::Get('http://aviationweather.gov/adds/' . $weathermode . '/?station_ids=' . $this->icao . '&std_trans=translated' . ($weathermode === 'metars' ? '&chk_metars=on&chk_tafs=on' : ''));
+					$this->match = false;
 				}
-			}
-			
-			if($this->down)
-			{	
-				$this->name = 'Unavailable';
 				
-				return;
-			}
-			
-			$dom = new DOMDocument();
-			@$dom->loadHTML($html);
-			$path = new DOMXPath($dom);
-			
-			$h1 = trim($path->query("//h1")->item(0)->nodeValue);	// Also used to create $this->name
-			
-			$this->match = strpos($h1, "Search results for ") === false;
-			
-			if(!$this->match)
-			{
-				return;
-			}
-			
-			$data = $path->query("//div[@class='column-in']/div")->item(0)->nodeValue;
-			
-			// LPL EGGP
-			// KMMV MMV
-			if(strpos($data, ' ') !== false)
-			{
-				$codes = explode(' ', $data);
-				
-				// Sometimes the codes are back-to-front - additional sanity check
-				// http://chat.stackexchange.com/transcript/message/13080686#13080686
-				for($i = 0; $i < 2; $i++)
+				else
 				{
-					if(strlen($codes[$i]) === 3)
-					{
-						$this->iata = $codes[$i];
-					}
+					$this->match = true;
 					
-					else if(strlen($codes[$i]) === 4)
-					{
-						$this->icao = $codes[$i];
-					}
+					$this->iata = $row['iata'];
+					$this->icao = $row['icao'];
+					$this->name = $row['name']; //iconv('UTF-8', 'ISO-8859-1', $row['name'])
+					
+					$result->free();
 				}
 			}
 			
-			// FDKB
 			else
 			{
-				$this->icao = $data;
+				die('Error #' . $db->errno . ' - ' . $db->error);
 			}
-			
-			$this->name = iconv('UTF-8', 'ISO-8859-1', $h1);
 			
 			// Shorten the URL to reduce the chance of hitting the 500 char limit
 			if($weathermode !== null)
 			{
 				$this->{rtrim($weathermode, 's')} = TinyURL::Get('http://aviationweather.gov/adds/' . $weathermode . '/?station_ids=' . $this->icao . '&std_trans=translated' . ($weathermode === 'metars' ? '&chk_metars=on&chk_tafs=on' : ''));
 			}
+			
+			$db->close();
 		}
 		
 		public function ToJSON()
