@@ -34,7 +34,7 @@
 				return;
 			}
 			
-			if($result = $db->query("SELECT * FROM iata_icao WHERE iata = '$input' OR icao = '$input'"))
+			if($result = $db->query("SELECT ident, iata, name FROM airports WHERE ident = '$input' OR iata = '$input'"))
 			{
 				$row = $result->fetch_assoc();
 				
@@ -48,8 +48,8 @@
 					$this->match = true;
 					
 					$this->iata = $row['iata'];
-					$this->icao = $row['icao'];
-					$this->name = $row['name']; //iconv('UTF-8', 'ISO-8859-1', $row['name'])
+					$this->icao = $row['ident'];
+					$this->name = iconv('ISO-8859-1', 'UTF-8', $row['name']);
 					
 					$result->free();
 				}
