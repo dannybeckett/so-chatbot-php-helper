@@ -24,7 +24,6 @@
 	$sql = <<<eoq
 DROP FUNCTION IF EXISTS	`distance`;
 DROP TABLE IF EXISTS	`airports`;
-DROP VIEW IF EXISTS		`iata_icao`;
 
 CREATE FUNCTION `distance` (`airport1` VARCHAR(4), `airport2` VARCHAR(4))
 RETURNS DOUBLE
@@ -62,17 +61,6 @@ CREATE TABLE `airports` (
 	UNIQUE INDEX `id_UNIQUE`	(`id` ASC),
 	UNIQUE INDEX `ident_UNIQUE`	(`ident` ASC)
 ) ENGINE = InnoDB;
-
-CREATE VIEW `iata_icao` AS
-	SELECT		`iata`,
-				`ident` AS `icao`,
-				`name`
-	FROM		`airports`
-	
-	WHERE		LENGTH(`iata`) = 3
-	AND			LENGTH(`ident`) = 4
-	AND			`iata` RLIKE '[A-Z]'
-	ORDER BY	`iata` ASC;
 
 LOAD DATA LOCAL INFILE '$csv'
 	INTO TABLE airports
